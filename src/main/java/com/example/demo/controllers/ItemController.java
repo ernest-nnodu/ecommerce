@@ -20,6 +20,7 @@ public class ItemController {
 	
 	@GetMapping
 	public ResponseEntity<List<Item>> getItems() {
+
 		return ResponseEntity.ok(itemRepository.findAll());
 	}
 	
@@ -35,5 +36,4 @@ public class ItemController {
 				: ResponseEntity.ok(items);
 			
 	}
-	
 }
