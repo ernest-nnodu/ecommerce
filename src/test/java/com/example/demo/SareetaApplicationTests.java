@@ -213,14 +213,14 @@ public class SareetaApplicationTests {
 				() -> assertEquals(mockItem.getId(), returnedCart.getItems().getFirst().getId()));
 	}
 
-	/*@Test
+	@Test
 	@WithMockUser
 	@DisplayName("Get items returns list of items")
 	public void getItems_returnsItems() throws Exception {
 		when(itemRepository.findAll()).thenReturn(List.of(mockItem));
 
 		MvcResult result = mockMvc.perform(get("/api/item")
-				.contentType(MediaType.APPLICATION_JSON))
+						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andReturn();
 
@@ -232,7 +232,25 @@ public class SareetaApplicationTests {
 				() -> assertFalse(returnedItems.isEmpty()),
 				() -> assertEquals(mockItem.getId(), returnedItems.getFirst().getId())
 		);
-	}*/
+	}
+
+	@Test
+	@WithMockUser
+	@DisplayName("")
+	public void getItemById() throws Exception {
+		MvcResult result = mockMvc.perform(get("/api/item/1")
+						.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andReturn();
+
+		String response = result.getResponse().getContentAsString();
+		Item returnedItem = json.readValue(response, Item.class);
+
+		assertAll(
+				() -> assertNotNull(returnedItem),
+				() -> assertEquals(mockItem.getId(), returnedItem.getId())
+		);
+	}
 
 	@Test
 	@DisplayName("Unauthenticated user cannot add item to cart")
