@@ -7,6 +7,7 @@ import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +19,9 @@ public class UserController {
 	
 	@Autowired
 	private CartRepository cartRepository;
+
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
@@ -32,13 +36,23 @@ public class UserController {
 	
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+
+		if (createUserRequest.getPassword().length() < 8) {
+			throw new IllegalArgumentException("Password must be min 8 characters long");
+		}
+
+		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
+			throw new IllegalArgumentException("Passwords do not match");
+		}
+
 		User user = new User();
 		user.setUsername(createUserRequest.getUsername());
+		user.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
 		Cart cart = new Cart();
 		cartRepository.save(cart);
 		user.setCart(cart);
 		userRepository.save(user);
+
 		return ResponseEntity.ok(user);
 	}
-	
 }
