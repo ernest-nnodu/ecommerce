@@ -5,6 +5,8 @@ import com.example.demo.model.persistence.User;
 import com.example.demo.model.persistence.repositories.CartRepository;
 import com.example.demo.model.persistence.repositories.UserRepository;
 import com.example.demo.model.requests.CreateUserRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,8 +25,11 @@ public class UserController {
 	@Autowired
 	private BCryptPasswordEncoder passwordEncoder;
 
+	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
 	@GetMapping("/id/{id}")
 	public ResponseEntity<User> findById(@PathVariable Long id) {
+
 		return ResponseEntity.of(userRepository.findById(id));
 	}
 	
@@ -36,12 +41,19 @@ public class UserController {
 	
 	@PostMapping("/create")
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
+		String username = createUserRequest.getUsername();
+
+		logger.info("Creating user {}", username);
 
 		if (createUserRequest.getPassword().length() < 8) {
+			logger.error("Unable to create user {}, Password for user {} less than eight characters",
+					username, username);
 			throw new IllegalArgumentException("Password must be min 8 characters long");
 		}
 
 		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
+			logger.error("Unable to create user {}, Password for user {} did not match confirmPassword",
+					username, username);
 			throw new IllegalArgumentException("Passwords do not match");
 		}
 
@@ -53,6 +65,7 @@ public class UserController {
 		user.setCart(cart);
 		userRepository.save(user);
 
+		logger.info("User {} successfully created", username);
 		return ResponseEntity.ok(user);
 	}
 }
