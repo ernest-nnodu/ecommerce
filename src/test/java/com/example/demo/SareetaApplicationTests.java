@@ -404,7 +404,7 @@ public class SareetaApplicationTests {
 
 	@Test
 	@WithMockUser
-	@DisplayName("")
+	@DisplayName("Get orders for user failed due to user not found")
 	public void getOrderForUser_invalidUsername_returnsUserNotFound() throws Exception {
 		mockMvc.perform(get("/api/order/history/testuser")
 						.contentType(MediaType.APPLICATION_JSON))
