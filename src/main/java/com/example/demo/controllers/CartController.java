@@ -40,17 +40,17 @@ public class CartController {
 		String username = request.getUsername();
 		long itemId = request.getItemId();
 
-		logger.info("Processing cart request for user {} to add item {}", username, itemId);
+		logger.info("ADD_TO_CART_REQUEST - Processing cart request for user {} to add item {}", username, itemId);
 
 		User user = userRepository.findByUsername(request.getUsername());
 		if(user == null) {
-			logError(username);
+			logError("ADD_TO_CART_FAILURE", username);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
 		Optional<Item> item = itemRepository.findById(request.getItemId());
-		if(!item.isPresent()) {
-			logError(itemId);
+		if(item.isEmpty()) {
+			logError("ADD_TO_CART_FAILURE", itemId);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
@@ -58,7 +58,7 @@ public class CartController {
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.addItem(item.get()));
 
-		logger.info("Item {} added to cart for user {}", itemId, username);
+		logger.info("ADD_TO_CART_SUCCESS - Item {} added to cart for user {}", itemId, username);
 		return ResponseEntity.ok(cartRepository.save(cart));
 	}
 
@@ -67,32 +67,33 @@ public class CartController {
 		String username = request.getUsername();
 		long itemId = request.getItemId();
 
-		logger.info("Processing cart request for user {} to remove item {}", username, itemId);
+		logger.info("REMOVE_FROM_CART_REQUEST - Processing cart request for user {} to remove item {}", username, itemId);
 
 		User user = userRepository.findByUsername(request.getUsername());
 		if(user == null) {
-			logError(username);
+			logError("REMOVE_FROM_CART_FAILURE", username);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 
 		Optional<Item> item = itemRepository.findById(request.getItemId());
-		if(!item.isPresent()) {
-			logError(itemId);
+		if(item.isEmpty()) {
+			logError("REMOVE_FROM_CART_FAILURE", itemId);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		Cart cart = user.getCart();
 		IntStream.range(0, request.getQuantity())
 			.forEach(i -> cart.removeItem(item.get()));
 
-		logger.info("Item {} removed from cart for user {}", itemId, username);
+		logger.info("REMOVE_FROM_CART_SUCCESS - Item {} removed from cart for user {}", itemId, username);
 		return ResponseEntity.ok(cartRepository.save(cart));
 	}
 
-	private void logError(long itemId) {
-		logger.error("Item {} not found in database", itemId);
+	private void logError(String error, long itemId) {
+
+		logger.error("{} - Item {} not found in database", error, itemId);
 	}
 
-	private void logError(String username) {
-		logger.error("User {} not found in database", username);
+	private void logError(String error, String username) {
+		logger.error("{} - User {} not found in database", error, username);
 	}
 }
