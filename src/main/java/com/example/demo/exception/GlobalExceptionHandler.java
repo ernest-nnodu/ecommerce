@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException ex) {
-        logger.error("Illegal argument exception detected {}", ex.getMessage());
+        logger.error("EXCEPTION - Illegal argument exception thrown, {}", ex.getMessage());
         return ResponseEntity.badRequest()
                 .body(ex.getMessage());
     }

@@ -27,36 +27,36 @@ public class OrderController {
 
 	@PostMapping("/submit/{username}")
 	public ResponseEntity<UserOrder> submit(@PathVariable String username) {
-		logger.info("Submitting order for user {}", username);
+		logger.info("SUBMIT_ORDER_REQUEST - Submitting order for user {}", username);
 
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			logError(username);
+			logError("SUBMIT_ORDER_FAILURE", username);
 			return ResponseEntity.notFound().build();
 		}
 		UserOrder order = UserOrder.createFromCart(user.getCart());
 		orderRepository.save(order);
 
-		logger.info("Submitted order for user {}", username);
+		logger.info("SUBMIT_ORDER_SUCCESS - Submitted order for user {}", username);
 		return ResponseEntity.ok(order);
 	}
 
 	@GetMapping("/history/{username}")
 	public ResponseEntity<List<UserOrder>> getOrdersForUser(@PathVariable String username) {
-		logger.info("Retrieving order history for user {}", username);
+		logger.info("ORDER_HISTORY_REQUEST - Retrieving order history for user {}", username);
 
 		User user = userRepository.findByUsername(username);
 		if(user == null) {
-			logError(username);
+			logError("ORDER_HISTORY_FAILURE", username);
 			return ResponseEntity.notFound().build();
 		}
 
 		List<UserOrder> orders = orderRepository.findByUser(user);
-		logger.info("Retrieved order history for user {}", username);
+		logger.info("ORDER_HISTORY_SUCCESS - Retrieved order history for user {}", username);
 		return ResponseEntity.ok(orders);
 	}
 
-	private void logError(String username) {
-		logger.error("User {} not found in database", username);
+	private void logError(String error, String username) {
+		logger.error("{} - User {} not found in database", error, username);
 	}
 }
