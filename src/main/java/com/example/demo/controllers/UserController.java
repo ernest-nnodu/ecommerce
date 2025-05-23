@@ -43,16 +43,16 @@ public class UserController {
 	public ResponseEntity<User> createUser(@RequestBody CreateUserRequest createUserRequest) {
 		String username = createUserRequest.getUsername();
 
-		logger.info("Creating user {}", username);
+		logger.info("CREATE_USER_REQUEST - Creating user {}", username);
 
 		if (createUserRequest.getPassword().length() < 8) {
-			logger.error("Unable to create user {}, Password for user {} less than eight characters",
+			logger.error("CREATE_USER_FAILURE - Unable to create user {}, Password for user {} less than eight characters",
 					username, username);
 			throw new IllegalArgumentException("Password must be min 8 characters long");
 		}
 
 		if (!createUserRequest.getPassword().equals(createUserRequest.getConfirmPassword())) {
-			logger.error("Unable to create user {}, Password for user {} did not match confirmPassword",
+			logger.error("CREATE_USER_FAILURE - Unable to create user {}, Password for user {} did not match confirmPassword",
 					username, username);
 			throw new IllegalArgumentException("Passwords do not match");
 		}
@@ -65,7 +65,7 @@ public class UserController {
 		user.setCart(cart);
 		userRepository.save(user);
 
-		logger.info("User {} successfully created", username);
+		logger.info("CREATE_USER_SUCCESS - User {} successfully created", username);
 		return ResponseEntity.ok(user);
 	}
 }
