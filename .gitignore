@@ -31,3 +31,7 @@ target/
 
 ### MacOs ###
 .DS_Store
+
+### ignore logs ###
+*.log
+logs/
